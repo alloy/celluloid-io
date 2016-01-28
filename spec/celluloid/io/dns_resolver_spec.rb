@@ -39,5 +39,10 @@ RSpec.describe Celluloid::IO::DNSResolver, library: :IO do
         expect(results).to be_an_instance_of(Resolv::IPv4)
       end
     end
+
+    it "raises SocketError if unable to connect to the nameserver" do
+      allow(Celluloid::IO::UDPSocket).to receive(:new).and_return(nil)
+      expect { Celluloid::IO::DNSResolver.new }.to raise_error(Celluloid::IO::DNSResolver::SocketNameResolutionError)
+    end
   end
 end

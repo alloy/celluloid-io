@@ -5,6 +5,8 @@ module Celluloid
   module IO
     # Asynchronous DNS resolver using Celluloid::IO::UDPSocket
     class DNSResolver
+      class SocketNameResolutionError < SocketError; end
+
       # Maximum UDP packet we'll accept
       MAX_PACKET_SIZE = 512
       DNS_PORT        = 53
@@ -29,7 +31,9 @@ module Celluloid
 
         # The non-blocking secret sauce is here, as this is actually a
         # Celluloid::IO::UDPSocket
-        @socket = UDPSocket.new(@server.family)
+        unless @socket = UDPSocket.new(@server.family)
+          fail SocketNameResolutionError, "nodename nor servname provided, or not known"
+        end
       end
 
       def resolve(hostname)
